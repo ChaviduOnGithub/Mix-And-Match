@@ -8,13 +8,22 @@ const cors = require("cors");
 const app = express();
 const session = require('express-session');
 
-const userRouter =require ('./routes/user')
+const userRoutes  =require ('./routes/user')
 const authRouter=require('./routes/authRouter')
 const cookieParser = require('cookie-parser');
 
 const PORT = process.env.PORT || 8070;
 
-app.use(cors());
+//app.use(cors());
+
+// CORS Configuration
+app.use(
+    cors({
+      origin: 'http://localhost:3000', // Replace this with your frontend URL
+      credentials: true, // Allow cookies and credentials across domains
+    })
+  );
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 
@@ -39,12 +48,27 @@ app.listen(PORT, () => {
 
 //routes
 //app.use(express.json());
-app.use('/api/user',userRouter);
+app.use('/api/user',userRoutes);
 app.use('/api/auth',authRouter);
 
+// app.use((err, req, res, next) => {
+//     const statusCode = err.statusCode || 500;
+//     const message = err.message || 'Internal Server Error';
+//     return res.status(statusCode).json({
+//       success: false,
+//       statusCode,
+//       message,
+//     });
+//   });
+
+// Error Handling Middleware
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Internal Server Error';
+  
+    // Optionally log errors to the console for debugging
+    console.error(`[Error] ${statusCode} - ${message}`);
+  
     return res.status(statusCode).json({
       success: false,
       statusCode,

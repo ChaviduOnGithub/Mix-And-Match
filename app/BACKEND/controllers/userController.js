@@ -9,8 +9,8 @@ const test=(req,res)=>{
 }
 
 const updateUser = async (req, res, next) => {
-  console.log('Request User ID:', req.user.id); // Log the ID from the token
-  console.log('Request Params ID:', req.params.id); // Log the ID from the URL params
+  //console.log('Request User ID:', req.user.id); // Log the ID from the token
+ // console.log('Request Params ID:', req.params.id); // Log the ID from the URL params
 
 
   if (req.user.id !== req.params.id)
@@ -42,7 +42,7 @@ const updateUser = async (req, res, next) => {
 };
 
 const deleteUser = async (req, res, next) => {
-  if (String(req.user._id) !== String(req.params._id))
+  if (req.user.id !== req.params.id)
     return next(errorHandler(401, 'You can only delete your own account!'));
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -52,6 +52,21 @@ const deleteUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// const getUser = async (req, res, next) => {
+//   try {
+    
+//     const user = await User.findById(req.params.id);
+  
+//     if (!user) return next(errorHandler(404, 'User not found!'));
+  
+//     const { password: pass, ...rest } = user._doc;
+  
+//     res.status(200).json(rest);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 module.exports={test, updateUser, deleteUser};
 

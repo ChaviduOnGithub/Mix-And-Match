@@ -70,28 +70,28 @@ export default function Profile(){
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      const token = localStorage.getItem('access_token'); 
+      //const token = localStorage.getItem('access_token'); 
       //const token = localStorage.getItem('token'); // or retrieve it from cookies
-      const res = await fetch(`api/user/update/${currentUser._id}`, {
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-           'Authorization': `Bearer ${token}`, // Add token here
+           //'Authorization': `Bearer ${token}`, // Add token here
         },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
-      // if (data.success === false) {
-      //   dispatch(updateUserFailure(data.message));
-      //   return;
-      // }
+      if (data.success === false) {
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
 
       // Check for 200 status and handle errors more precisely
-    if (!res.ok) {
-      console.error(`Update failed: ${res.status} - ${res.statusText}`);
-      dispatch(updateUserFailure(data.message || 'Failed to update user'));
-      return;
-    }
+    // if (!res.ok) {
+    //   console.error(`Update failed: ${res.status} - ${res.statusText}`);
+    //   dispatch(updateUserFailure(data.message || 'Failed to update user'));
+    //   return;
+    // }
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
@@ -122,11 +122,16 @@ export default function Profile(){
       dispatch(signOutUserStart());
       const res = await fetch('http://localhost:8070/api/auth/signout');
       
+
+      // const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+      //   method: 'DELETE',
+
+      // });
       // Check if the response is OK (status 200-299)
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Error: ${res.status} ${res.statusText} - ${errorText}`);
-      }
+      // if (!res.ok) {
+      //   const errorText = await res.text();
+      //   throw new Error(`Error: ${res.status} ${res.statusText} - ${errorText}`);
+      // }
   
       const data = await res.json();
       if (data.success === false) {
@@ -144,7 +149,7 @@ export default function Profile(){
   // const handleSignOut = async () => {
   //   try {
   //     dispatch(signOutUserStart());
-  //     const res = await fetch('/api/auth/signout');
+  //     const res = await fetch('http://localhost:8070/api/auth/signout');
   //     const data = await res.json();
   //     if (data.success === false) {
   //       dispatch(deleteUserFailure(data.message));
@@ -157,10 +162,10 @@ export default function Profile(){
   // };
 
   // Debugging: Log currentUser and formData to ensure they are set correctly
-  useEffect(() => {
-    console.log('Current User:', currentUser);
-    console.log('Form Data:', formData);
-  }, [currentUser, formData]);
+  // useEffect(() => {
+  //   console.log('Current User:', currentUser);
+  //   console.log('Form Data:', formData);
+  // }, [currentUser, formData]);
 
 
     return(
@@ -326,3 +331,5 @@ export default function Profile(){
 // }
 
 // export default UserProfile;
+
+

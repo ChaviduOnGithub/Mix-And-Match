@@ -33,7 +33,7 @@ const login = async (req, res, next) => {
       const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = validUser._doc;
       res
-        .cookie('access_token', token, { httpOnly: true })
+        .cookie('access_token', token, { httpOnly: true, path: '/' })
         .status(200)
         .json(rest);
     } catch (error) {
@@ -48,7 +48,7 @@ const google = async (req, res, next) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = user._doc;
       res
-        .cookie('access_token', token, { httpOnly: true })
+        .cookie('access_token', token, { httpOnly: true, path: '/' })
         .status(200)
         .json(rest);
     } else {
@@ -68,7 +68,7 @@ const google = async (req, res, next) => {
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       const { password: pass, ...rest } = newUser._doc;
       res
-        .cookie('access_token', token, { httpOnly: true })
+        .cookie('access_token', token, { httpOnly: true, path: '/' })
         .status(200)
         .json(rest);
     }
@@ -77,9 +77,29 @@ const google = async (req, res, next) => {
   }
 };
 
+// const signOut = async (req, res, next) => {
+//   try {
+//     //res.clearCookie('access_token');
+
+//     res.clearCookie('access_token', { httpOnly: true, path: '/' });
+//     res.status(200).json('User has been logged out!');
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 const signOut = async (req, res, next) => {
   try {
-    res.clearCookie('access_token');
+    // Log to check if the access_token exists in the request
+    console.log('Cookies before clearing:', req.cookies);
+
+    // Clear the 'access_token' cookie
+    res.clearCookie('access_token', { httpOnly: true, path: '/' });
+
+    // Log after trying to clear the cookie
+    console.log('Cookies after clearing:', req.cookies);
+
+    // Respond with a success message
     res.status(200).json('User has been logged out!');
   } catch (error) {
     next(error);
@@ -87,4 +107,4 @@ const signOut = async (req, res, next) => {
 };
 
 
-module.exports={signup,login,google,signOut}
+module.exports={signup,login,google,signOut};
