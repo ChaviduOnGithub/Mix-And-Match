@@ -77,34 +77,34 @@ const google = async (req, res, next) => {
   }
 };
 
-// const signOut = async (req, res, next) => {
-//   try {
-//     //res.clearCookie('access_token');
-
-//     res.clearCookie('access_token', { httpOnly: true, path: '/' });
-//     res.status(200).json('User has been logged out!');
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
 const signOut = async (req, res, next) => {
   try {
-    // Log to check if the access_token exists in the request
-    console.log('Cookies before clearing:', req.cookies);
+    //res.clearCookie('access_token');
 
-    // Clear the 'access_token' cookie
     res.clearCookie('access_token', { httpOnly: true, path: '/' });
-
-    // Log after trying to clear the cookie
-    console.log('Cookies after clearing:', req.cookies);
-
-    // Respond with a success message
     res.status(200).json('User has been logged out!');
   } catch (error) {
     next(error);
   }
 };
+
+// const signOut = async (req, res, next) => {
+//   try {
+//     // Log to check if the access_token exists in the request
+//     console.log('Cookies before clearing:', req.cookies);
+
+//     // Clear the 'access_token' cookie
+//     res.clearCookie('access_token', { httpOnly: true, path: '/' });
+
+//     // Log after trying to clear the cookie
+//     console.log('Cookies after clearing:', req.cookies);
+
+//     // Respond with a success message
+//     res.status(200).json('User has been logged out!');
+//   } catch (error) {
+//     next(error);
+//   }
+//};
 
 
 module.exports={signup,login,google,signOut};

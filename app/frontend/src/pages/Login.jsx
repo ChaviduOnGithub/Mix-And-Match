@@ -8,7 +8,7 @@ import {
 } from '../redux/user/userSlice';
 import OAuth from '../components/accounts-management/OAuth';
 
-export default function SignIn() {
+export default function Login() {
   const [formData, setFormData] = useState({});
   const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -19,8 +19,32 @@ export default function SignIn() {
       [e.target.id]: e.target.value,
     });
   };
+
+  const validateForm = () => {
+    const { email, password } = formData;
+
+    if (!email || email.trim() === '') {
+      return 'Email is required';
+    }
+
+    if (!password || password.trim() === '') {
+      return 'Password is required';
+    }
+
+    return null; // No errors
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+
+    // Validate the form
+    const validationError = validateForm();
+    if (validationError) {
+      dispatch(signInFailure(validationError));
+      return;
+    }
+
     try {
       dispatch(signInStart());
       const res = await fetch('http://localhost:8070/api/auth/login', {

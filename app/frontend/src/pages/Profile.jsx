@@ -70,13 +70,13 @@ export default function Profile(){
     e.preventDefault();
     try {
       dispatch(updateUserStart());
-      //const token = localStorage.getItem('access_token'); 
+      const token = localStorage.getItem('access_token'); 
       //const token = localStorage.getItem('token'); // or retrieve it from cookies
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-           //'Authorization': `Bearer ${token}`, // Add token here
+           'Authorization': `Bearer ${token}`, // Add token here
         },
         body: JSON.stringify(formData),
       });

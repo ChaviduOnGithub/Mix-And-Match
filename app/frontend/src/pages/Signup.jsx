@@ -14,8 +14,50 @@ export default function SignUp() {
       [e.target.id]: e.target.value,
     });
   };
+
+
+  const validateForm = () => {
+    const { username, email, password } = formData;
+
+    if (!username || username.trim() === '') {
+      return 'Username is required';
+    }
+
+    if (!email || email.trim() === '') {
+      return 'Email is required';
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Invalid email format';
+    }
+
+    if (!password || password.trim() === '') {
+      return 'Password is required';
+    }
+
+    // Password strength validation (at least 6 characters)
+    if (password.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+
+    return null; // No errors
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+
+    // Validate the form
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+
     try {
       setLoading(true);
       const res = await fetch('http://localhost:8070/api/auth/signup', {
@@ -40,6 +82,8 @@ export default function SignUp() {
       setError(error.message);
     }
   };
+
+
   
   return (
     <div className='p-3 max-w-lg mx-auto'>
