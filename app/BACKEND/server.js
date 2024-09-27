@@ -30,3 +30,11 @@ connection.once("open", () => {
 app.listen(PORT, () => {
     console.log(`Server is up and running on port ${PORT}`);
 });
+
+
+
+const clothingRoutes = require('./routes/clothingRoutes');
+app.use('/api', clothingRoutes);
+
+const uploadRoutes = require('./routes/clothingRoutes');
+app.use(uploadRoutes);
