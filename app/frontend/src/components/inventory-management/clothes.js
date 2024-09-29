@@ -19,6 +19,10 @@ export default function Clothes() {
     const [supplierId, setSupplierId] = useState('');
     const [error, setError] = useState('');
     const [quantityChartData, setQuantityChartData] = useState(null);
+    const [image, setImage] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+    
 
    /* useEffect(() => {
         // Function to generate quantity chart data
@@ -110,6 +114,32 @@ export default function Clothes() {
             });
     }, []);
 
+    // Define resetForm function
+    const resetForm = () => {
+        setItemCode('');
+        setItemName('');
+        setCategory('');
+        setPrice('');
+        setQuantity('');
+        setAlertQuantity('');
+        setSupplierId('');
+        setSelectedFile(null);
+    };
+
+    //Function to handle image upload
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0]; // Get the first file
+        if (file) {
+            setImage(file); // Store the image file in state
+        }
+
+        setSelectedFile(file);
+
+        // Create a preview URL for the selected image
+        const previewUrl = URL.createObjectURL(file);
+        setImagePreviewUrl(previewUrl);
+    };
+
     // Function to handle delete clothes
     const handleDeleteClothes = (itemCode) => {
         axios.delete(`http://localhost:8070/clothes/delete/${itemCode}`)
@@ -152,30 +182,29 @@ export default function Clothes() {
         try {
             setError('');
 
-            if (!itemCode || !itemName || !category || !price || !quantity || !alertQuantity || !supplierId) {
+            if (!itemCode || !itemName || !category || !price || !quantity || !alertQuantity || !supplierId || !selectedFile) {
                 setError('All fields are required.');
                 return;
             }
 
+            const formData = new FormData(); // Create a FormData object
+            formData.append('item_code', itemCode);
+            formData.append('item_name', itemName);
+            formData.append('category', category);
+            formData.append('price', price);
+            formData.append('quantity', quantity);
+            formData.append('alert_quantity', alertQuantity);
+            formData.append('supplier_id', supplierId);
+            formData.append('file', selectedFile); // Append the image file
+
             if (selectedClothes) {
-                await axios.put(`http://localhost:8070/clothes/update/${selectedClothes.item_code}`, {
-                    item_code: itemCode,
-                    item_name: itemName,
-                    category: category,
-                    price: price,
-                    quantity: quantity,
-                    alert_quantity: alertQuantity,
-                    supplier_id: supplierId
+                await axios.put(`http://localhost:8070/clothes/update/${selectedClothes.item_code}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // Set the content type for file uploads
+                    }
                 });
 
-                setItemCode('');
-                setItemName('');
-                setCategory('');
-                setPrice('');
-                setQuantity('');
-                setAlertQuantity('');
-                setSupplierId('');
-
+                resetForm();
                 setShowUpdateModal(false);
             } else {
                 // Check if the item code already exists
@@ -185,16 +214,13 @@ export default function Clothes() {
                     return;
                 }
 
-                await axios.post('http://localhost:8070/clothes/add', {
-                    item_code: itemCode,
-                    item_name: itemName,
-                    category: category,
-                    price: price,
-                    quantity: quantity,
-                    alert_quantity: alertQuantity,
-                    supplier_id: supplierId
+                await axios.post('http://localhost:8070/clothes/upload', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // Set the content type for file uploads
+                    }
                 });
 
+                resetForm();
                 setShowAddModal(false);
             }
 
@@ -439,6 +465,7 @@ export default function Clothes() {
                         <div className="form-group">
                             <label>Category: F-Female M-Male</label>
                             <select className="form-control" value={category} onChange={(e) => setCategory(e.target.value)}>
+                                <option value="">Select One</option>
                                 <option value="F">F</option>
                                 <option value="M">M</option>
                             </select>
@@ -458,6 +485,10 @@ export default function Clothes() {
                         <div className="form-group">
                             <label>Supplier ID</label>
                             <input type="text" className="form-control" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} />
+                        </div>
+                        <div className="form-group">
+                            <label>Upload Image</label>
+                            <input type="file" className="form-control" accept="image/*" onChange={(e) => handleImageUpload(e)} />
                         </div>
                         <button type="submit" className="btn btn-primary">Add Clothes</button>
                         <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Close</button>
@@ -491,6 +522,7 @@ export default function Clothes() {
                         <div className="form-group">
                             <label>Category: F-Female M-Male</label>
                             <select className="form-control" value={category} onChange={(e) => setCategory(e.target.value)}>
+                                <option value="">Select One</option>
                                 <option value="F">F</option>
                                 <option value="M">M</option>
                             </select>
@@ -510,6 +542,10 @@ export default function Clothes() {
                         <div className="form-group">
                             <label>Supplier ID</label>
                             <input type="text" className="form-control" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} />
+                        </div>
+                        <div className="form-group">
+                            <label>Upload Image</label>
+                            <input type="file" className="form-control" accept="image/*" onChange={(e) => handleImageUpload(e)} />
                         </div>
                         <button type="submit" className="btn btn-primary">Update Clothes</button>
                         <button type="button" className="btn btn-secondary" onClick={() => setShowUpdateModal(false)}>Close</button>
@@ -552,6 +588,7 @@ export default function Clothes() {
                             <th>Quantity</th>
                             <th>Alert Quantity</th>
                             <th>Supplier ID</th>
+                            <th>Image</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -566,6 +603,12 @@ export default function Clothes() {
                                 <td>{clothes.quantity}</td>
                                 <td>{clothes.alert_quantity}</td>
                                 <td>{clothes.supplier_id}</td>
+                                <td>
+                                    {/* Display the image if it exists */}
+                                    {clothes.imageUrl && (
+                                        <img src={clothes.imageUrl} alt={clothes.item_name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                    )}
+                                </td>
                                 <td>
                                     <button className="btn btn-outline-primary me-2" onClick={() => handleOpenUpdateModal(clothes)}>Update</button>
                                     <button className="btn btn-outline-danger me-2" onClick={() => handleOpenDeleteConfirmationModal(clothes)}>Delete</button>

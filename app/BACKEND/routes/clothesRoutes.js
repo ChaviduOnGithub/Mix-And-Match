@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const clothes = require('../models/clothesmodel');
+const clothes = require('../models/clothesModel.js');
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
@@ -244,6 +244,9 @@ router.route("/decrease/:item_code").put(async (req, res) => {
         res.status(500).send({ status: "Error decreasing quantity" });
     }
 })
+
+
+  
 
 
 module.exports = router;
