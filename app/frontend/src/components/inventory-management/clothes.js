@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Row, Col, Card, Button } from 'react-bootstrap';
+import ClothesReturn from './return.js';
 
 
 export default function Clothes() {
@@ -22,85 +23,6 @@ export default function Clothes() {
     const [image, setImage] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
-    
-
-   /* useEffect(() => {
-        // Function to generate quantity chart data
-        const generateQuantityChartData = () => {
-            const labels = clothes.map(clothes => clothes.item_name);
-            const data = clothes.map(clothes => clothes.quantity);
-
-            return {
-                labels: labels,
-                data: data
-            };
-        };
-
-        // Generate initial chart data
-        setQuantityChartData(generateQuantityChartData());
-
-        // Cleanup function
-        return () => {
-            setQuantityChartData(null);
-        };
-    }, [clothes]);*/
-
-    // useEffect(() => {
-    //     let quantityChart = null;
-    
-    //     // Function to create or update the quantity line chart
-    //     const createOrUpdateQuantityChart = () => {
-    //         const canvas = document.getElementById('canvas-1');
-    
-    //         // Check if canvas or clothes array is null or empty, and if so, return early
-    //         if (!canvas || !Array.isArray(clothes) || clothes.length === 0) {
-    //             console.error('Canvas is null or clothes array is empty');
-    //             return;
-    //         }
-            
-    
-    //         // Extract labels and data from the clothes array
-    //         const labels = clothes.map(clothes => clothes.item_name);
-    //         const data = clothes.map(clothes => clothes.quantity);
-    
-    //         // Create the new chart instance
-    //         quantityChart = new Chart(document.getElementById('canvas-1'), {
-    //             type: 'line',
-    //             data: {
-    //                 labels: labels,
-    //                 datasets: [{
-    //                     label: 'Quantity',
-    //                     data: data,
-    //                     borderColor: 'rgba(75, 192, 192, 1)',
-    //                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-    //                     borderWidth: 1
-    //                 }]
-    //             },
-    //             options: {
-    //                 responsive: true,
-    //                 scales: {
-    //                     y: {
-    //                         beginAtZero: true
-    //                     }
-    //                 }
-    //             }
-    //         });
-    //     };
-    
-    //     // Call the function to create or update the quantity chart
-    //     const timeoutId = setTimeout(() => {
-    //         createOrUpdateQuantityChart();
-    //     }, 100);
-    
-    //     // Cleanup function
-    //     return () => {
-    //         clearTimeout(timeoutId);
-    //         if (quantityChart) {
-    //             quantityChart.destroy();
-    //         }
-    //     };
-
-    // }, [clothes]);
     
     
 
@@ -243,61 +165,7 @@ export default function Clothes() {
     
         const printWindow = window.open("", "_blank", "width=600,height=600");
         printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Clothes Stock Report</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            padding: 20px;
-                        }
-                        h1 {
-                            text-align: center;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            margin-bottom: 20px;
-                        }
-                        th, td {
-                            border: 1px solid #ccc;
-                            padding: 8px;
-                            text-align: left;
-                        }
-                        th {
-                            background-color: #f2f2f2;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <h1>Clothes Stock Report</h1>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item Code</th>
-                                <th>Item Name</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${clothes.map(clothes => `
-                                <tr>
-                                    <td>${clothes.item_code}</td>
-                                    <td>${clothes.item_name}</td>
-                                    <td>${clothes.quantity}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                    <h3>Total Clothes Items: ${clothes.length}</h3>
-                    <h3>Total Quantity: ${totalQuantity}</h3>
-                    <div class="button-container">
-                        <button onclick="window.print()" class="btn btn-primary">Print</button>
-                        <button onclick="downloadCustomerReport()" class="btn btn-primary">Download PDF</button>
-                        <button onclick="window.close()" class="btn btn-secondary">Close</button>
-                    </div>
-                </body>
-            </html>
+            
         `);
         printWindow.document.close();
         
@@ -334,316 +202,45 @@ export default function Clothes() {
         }
     };
     
-    /*
-    useEffect(() => {
-        let lineChart = null;
-
-        // Function to create or update the line chart
-        const createOrUpdateLineChart = () => {
-            // If a previous Chart instance exists, destroy it
-            if (lineChart) {
-                lineChart.destroy();
-            }
-
-            // Extracting data for the chart
-            const salesLabels = profit.map(profit => profit.Month);
-            const salesData = profit.map(profit => parseFloat(profit.Sales_income));
-            const expenseData = profit.map(profit => parseFloat(profit.Other_expenses + profit.Supplier_expenses + profit.Salaries));
-
-            // Create the line chart
-            lineChart = new Chart(document.getElementById('canvas-1'), {
-                type: 'line',
-                data: {
-                    labels: salesLabels,
-                    datasets: [
-                        {
-                            label: 'Sales',
-                            data: salesData,
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderWidth: 1
-                        },
-                        {
-                            label: 'Expenses',
-                            data: expenseData,
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderWidth: 1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        };
-        createOrUpdateLineChart();
-
-        // Cleanup function to destroy the charts when the component unmounts
-        return () => {
-            if (lineChart) {
-                lineChart.destroy();
-            }
-        };
-    }, [otherExpenses, monthlyProfit]);*/
+    
     
 
     return (
-        
+        <ClothesReturn
+            clothes={clothes}
+            searchQuery={searchQuery}
+            handleSearch={handleSearch}
+            handleOpenAddModal={handleOpenAddModal}
+            showAddModal={showAddModal}
+            setShowAddModal={setShowAddModal}
+            handleFormSubmit={handleFormSubmit}
+            error={error}
+            itemCode={itemCode}
+            setItemCode={setItemCode}
+            itemName={itemName}
+            setItemName={setItemName}
+            category={category}
+            setCategory={setCategory}
+            price={price}
+            setPrice={setPrice}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            alertQuantity={alertQuantity}
+            setAlertQuantity={setAlertQuantity}
+            supplierId={supplierId}
+            setSupplierId={setSupplierId}
+            handleImageUpload={handleImageUpload}
+            showUpdateModal={showUpdateModal}
+            setShowUpdateModal={setShowUpdateModal}
+            selectedItemForDelete={selectedItemForDelete}
+            handleCancelDelete={handleCancelDelete}
+            handleConfirmDelete={handleConfirmDelete}
+            filteredClothes={filteredClothes}
+            handleOpenUpdateModal={handleOpenUpdateModal}
+            handleOpenDeleteConfirmationModal={handleOpenDeleteConfirmationModal}
+            generateReport={generateReport}
+        /> 
 
-            <div className="container">
-            <div className="row">
-                    {/* Current Date and Time */}
-                    <div className="col-md-6 text-md-end mb-3">
-                        
-                    </div>
-                </div>
-                <h1>Manage Clothes</h1>
-                <Row className="mb-3">
-                    {/*<Col>
-                        <Card className="h-100">
-                            <Card.Body>
-                                <Card.Title>Generate Report</Card.Title>
-                                <Card.Text>
-                                    Generate a report about all customer details and loyalty points.
-                                </Card.Text>
-                                <Button className="btn btn-dark" onClick={generateReport}>Generate Report</Button>
-                            </Card.Body>
-                        </Card>
-                    </Col> */}
-                    <div className="col-md-4">
-                        <div className="card">
-                            <div className="card-body">
-                                <h4 className="card-title">Total Items</h4>
-                                <div className="text-center my-auto">
-                                    <h1 className="card-text">{clothes.length}</h1>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
-                </Row>
-                
-
-                {/* Search input */}
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="flex-grow-1">
-                        <input type="text" className="form-control" placeholder="Search by Item Code" value={searchQuery} onChange={handleSearch} />
-                    </div>
-                    <div>
-                        <button onClick={handleOpenAddModal} className="btn btn-outline-success">Add New Clothes</button>
-                    </div>
-                </div>
-
-                {/* Modal for adding new clothes */}
-                {/* Modal for adding new clothes */}
-    <div className="modal" style={{ display: showAddModal ? 'block' : 'none' }}>
-        <div className="modal-dialog">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h5 className="modal-title">Add New Clothes</h5>
-                    <button type="button" className="close" style={{ position: 'absolute', right: '10px', top: '10px' }} onClick={() => setShowAddModal(false)}>
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    <form onSubmit={handleFormSubmit}>
-                        {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                        <div className="form-group">
-                            <label>Item Code</label>
-                            <input type="text" className="form-control" value={itemCode} onChange={(e) => setItemCode(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Item Name</label>
-                            <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Category: F-Female M-Male</label>
-                            <select className="form-control" value={category} onChange={(e) => setCategory(e.target.value)}>
-                                <option value="">Select One</option>
-                                <option value="F">F</option>
-                                <option value="M">M</option>
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label>Price</label>
-                            <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Quantity</label>
-                            <input type="number" className="form-control" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Alert Quantity</label>
-                            <input type="number" className="form-control" value={alertQuantity} onChange={(e) => setAlertQuantity(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Supplier ID</label>
-                            <input type="text" className="form-control" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Upload Image</label>
-                            <input type="file" className="form-control" accept="image/*" onChange={(e) => handleImageUpload(e)} />
-                        </div>
-                        <button type="submit" className="btn btn-primary">Add Clothes</button>
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Close</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {/* Modal for updating clothes */}
-    <div className="modal" style={{ display: showUpdateModal ? 'block' : 'none' }}>
-        <div className="modal-dialog">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h5 className="modal-title">Update Clothes</h5>
-                    <button type="button" className="close" style={{ position: 'absolute', right: '10px', top: '10px' }} onClick={() => setShowUpdateModal(false)}>
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    <form onSubmit={handleFormSubmit}>
-                        {error && <div className="alert alert-danger" role="alert">{error}</div>}
-                        <div className="form-group">
-                            <label>Item Code</label>
-                            <input type="text" className="form-control" value={itemCode} onChange={(e) => setItemCode(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Item Name</label>
-                            <input type="text" className="form-control" value={itemName} onChange={(e) => setItemName(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Category: F-Female M-Male</label>
-                            <select className="form-control" value={category} onChange={(e) => setCategory(e.target.value)}>
-                                <option value="">Select One</option>
-                                <option value="F">F</option>
-                                <option value="M">M</option>
-                            </select>
-                        </div>
-                        <div className="form-group">
-                            <label>Price</label>
-                            <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Quantity</label>
-                            <input type="number" className="form-control" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Alert Quantity</label>
-                            <input type="number" className="form-control" value={alertQuantity} onChange={(e) => setAlertQuantity(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Supplier ID</label>
-                            <input type="text" className="form-control" value={supplierId} onChange={(e) => setSupplierId(e.target.value)} />
-                        </div>
-                        <div className="form-group">
-                            <label>Upload Image</label>
-                            <input type="file" className="form-control" accept="image/*" onChange={(e) => handleImageUpload(e)} />
-                        </div>
-                        <button type="submit" className="btn btn-primary">Update Clothes</button>
-                        <button type="button" className="btn btn-secondary" onClick={() => setShowUpdateModal(false)}>Close</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {/* Modal for delete confirmation*/}
-<div className="modal" style={{ display: selectedItemForDelete ? 'block' : 'none' }}>
-    <div className="modal-dialog">
-        <div className="modal-content">
-            <div className="modal-header">
-                <h5 className="modal-title">Confirm Delete</h5>
-                <button type="button" className="close" style={{ position: 'absolute', right: '10px', top: '10px' }} onClick={handleCancelDelete}>
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div className="modal-body">
-                <p>Are you sure you want to delete {selectedItemForDelete?.item_name}?</p>
-            </div>
-            <div className="modal-footer">
-                <button type="button" className="btn btn-danger" onClick={handleConfirmDelete}>Delete</button>
-                <button type="button" className="btn btn-secondary" onClick={handleCancelDelete}>Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-                {/* Clothes table */}
-                <table className="table">
-                    <thead className="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Item Code</th>
-                            <th>Item Name</th>
-                            <th>Category: F-Female M-Male</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Alert Quantity</th>
-                            <th>Supplier ID</th>
-                            <th>Image</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredClothes.map((clothes, index) => (
-                            <tr key={clothes.item_code}>
-                                <td>{index + 1}</td>
-                                <td>{clothes.item_code}</td>
-                                <td>{clothes.item_name}</td>
-                                <td>{clothes.category}</td>
-                                <td>{clothes.price}</td>
-                                <td>{clothes.quantity}</td>
-                                <td>{clothes.alert_quantity}</td>
-                                <td>{clothes.supplier_id}</td>
-                                <td>
-                                    {/* Display the image if it exists */}
-                                    {clothes.imageUrl && (
-                                        <img src={clothes.imageUrl} alt={clothes.item_name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                    )}
-                                </td>
-                                <td>
-                                    <button className="btn btn-outline-primary me-2" onClick={() => handleOpenUpdateModal(clothes)}>Update</button>
-                                    <button className="btn btn-outline-danger me-2" onClick={() => handleOpenDeleteConfirmationModal(clothes)}>Delete</button>
-                                </td>
-                                {/* Check if quantity is less than or equal to the alert quantity */}
-                                {clothes.quantity <= clothes.alert_quantity && (
-                                    <td>
-                                        <div className="alert alert-warning" role="alert">
-                                            Alert: Reorder this item!
-                                        </div>
-                                    </td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-
-                <Row className="mb-3">
-                    <Col>
-                        <Card className="h-100">
-                            <Card.Body>
-                                <Card.Title>Clothes Quantity Chart</Card.Title>
-                                <Card.Text>
-                                    Track the quantity of clothes over time.
-                                </Card.Text>
-                                <canvas id="canvas-1"></canvas>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    </Row>
-            </div>
             
-      
-
-        
-
     );
 }
