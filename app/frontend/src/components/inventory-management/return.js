@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col, Card, Button } from "react-bootstrap";
 
+
 const ClothesReturn = ({
   clothes,
   searchQuery,
@@ -216,55 +217,47 @@ const ClothesReturn = ({
           </div>
       </div>
 
-                      {/* Clothes table */}
-                      <table className="table">
-                          <thead className="table-dark">
-                              <tr>
-                                  <th>#</th>
-                                  <th>Item Code</th>
-                                  <th>Item Name</th>
-                                  <th>Category: F-Female M-Male</th>
-                                  <th>Price</th>
-                                  <th>Quantity</th>
-                                  <th>Alert Quantity</th>
-                                  <th>Supplier ID</th>
-                                  <th>Image</th>
-                                  <th>Action</th>
-                              </tr>
-                          </thead>
-                          <tbody>
-                              {filteredClothes.map((clothes, index) => (
-                                  <tr key={clothes.item_code}>
-                                      <td>{index + 1}</td>
-                                      <td>{clothes.item_code}</td>
-                                      <td>{clothes.item_name}</td>
-                                      <td>{clothes.category}</td>
-                                      <td>{clothes.price}</td>
-                                      <td>{clothes.quantity}</td>
-                                      <td>{clothes.alert_quantity}</td>
-                                      <td>{clothes.supplier_id}</td>
-                                      <td>
-                                          {/* Display the image if it exists */}
-                                          {clothes.imageUrl && (
-                                              <img src={clothes.imageUrl} alt={clothes.item_name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
-                                          )}
-                                      </td>
-                                      <td>
-                                          <button className="btn btn-outline-primary me-2" onClick={() => handleOpenUpdateModal(clothes)}>Update</button>
-                                          <button className="btn btn-outline-danger me-2" onClick={() => handleOpenDeleteConfirmationModal(clothes)}>Delete</button>
-                                      </td>
-                                      {/* Check if quantity is less than or equal to the alert quantity */}
-                                      {clothes.quantity <= clothes.alert_quantity && (
-                                          <td>
-                                              <div className="alert alert-warning" role="alert">
-                                                  Alert: Reorder this item!
-                                              </div>
-                                          </td>
-                                      )}
-                                  </tr>
-                              ))}
-                          </tbody>
-                      </table>
+        {/* Card for display items*/}
+      <div className="mt-4">
+                <Row xs={1} sm={2} md={3} lg={4}>
+                        <Col  className="mb-4">
+                            <Card className="card-up card-shadow-1" style={{height:"100%"}} >
+                            {filteredClothes.map((clothes) => (
+                                <><Card.Body>
+                                    <Card.Title className="text-center">{clothes.item_name}</Card.Title><br></br>
+                                    <Card.Text className="text-center">
+
+                                        <div className="fw-light">{/* Display the image if it exists */}
+                                            {clothes.imageUrl && (
+                                                <img src={clothes.imageUrl} alt={clothes.item_name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} />
+                                            )}
+                                        </div>
+                                        <div className="fw-light">Item Code: <span className="fw-normal">{clothes.item_code}</span></div>
+                                        <div className="fw-light">Category(M-Male, F-Female): <span className="fw-normal">{clothes.category}</span></div>
+                                        <div className="fw-light">Price: <span className="fw-normal">{clothes.price}</span></div>
+                                        <div className="fw-light">Quantity: <span className="fw-normal">{clothes.quantity}</span></div>
+                                        <div className="fw-light">Alert Quantity: <span className="fw-normal">{clothes.alert_quantity}</span></div>
+
+                                    </Card.Text>
+                                </Card.Body><Card.Footer>
+                                        <div className="">
+                                            <div className="text-center mt-3">
+                                                <Button variant="dark" id="up-btn" size="sm" className="mt-2" onClick={() => handleOpenUpdateModal(clothes)}>
+                                                    <i className="bi bi-shop-window me-2"></i> Update
+                                                </Button>
+                                                <Button variant="dark" id="up-btn" size="sm" className="mt-2" onClick={() => handleOpenDeleteConfirmationModal(clothes)}>
+                                                    <i className="bi bi-shop-window me-2"></i> Delete
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </Card.Footer></>
+                            ))} 
+                            </Card>
+                        </Col>
+                </Row>
+            </div>
+
+                      
 
                       <Row className="mb-3">
                           <Col>
