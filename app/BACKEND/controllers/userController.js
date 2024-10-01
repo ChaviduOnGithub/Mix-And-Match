@@ -89,6 +89,45 @@ const updateUser = async (req, res, next) => {
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
     }
 
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(errorHandler(404, 'User not found.'));
+    }
+
+    const updatedFields = {};
+    if (req.body.username && req.body.username !== user.username) {
+      updatedFields.username = {
+        previousValue: user.username,
+        newValue: req.body.username,
+      };
+    }
+    if (req.body.email && req.body.email !== user.email) {
+      updatedFields.email = {
+        previousValue: user.email,
+        newValue: req.body.email,
+      };
+    }
+    if (req.body.password) {
+      req.body.password = bcryptjs.hashSync(req.body.password, 10);
+      updatedFields.password = {
+        previousValue: '******',
+        newValue: '******',
+      };
+    }
+    if (req.body.avatar && req.body.avatar !== user.avatar) {
+      updatedFields.avatar = {
+        previousValue: user.avatar,
+        newValue: req.body.avatar,
+      };
+    }
+
+    const updateHistory = Object.keys(updatedFields).map((field) => ({
+      field,
+      previousValue: updatedFields[field].previousValue,
+      newValue: updatedFields[field].newValue,
+      updatedAt: new Date(), // capture update time
+    }));
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -98,14 +137,33 @@ const updateUser = async (req, res, next) => {
           password: req.body.password,
           avatar: req.body.avatar,
         },
+
+        $push: { updateHistory: { $each: updateHistory } }, // Save update history
+
       },
       { new: true }
     );
 
+    if (!updatedUser) {
+      return next(errorHandler(404, 'User not found.'));
+    }
+
+    // Remove password from the response
     const { password, ...rest } = updatedUser._doc;
 
     res.status(200).json(rest);
   } catch (error) {
+
+    if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
+      // Email already exists
+      return next(errorHandler(400, 'This email is already associated with another account. Please use a different email.'));
+    }
+
+    if (error.keyPattern && error.keyPattern.username) {
+      // Username already exists
+      return next(errorHandler(400, 'This username is already taken. Please choose a different username.'));
+    }
+
     next(error,"next err");
   }
 };
@@ -118,6 +176,8 @@ const deleteUser = async (req, res, next) => {
     res.clearCookie('access_token');
     res.status(200).json('User has been deleted!');
   } catch (error) {
+
+    next(errorHandler(500, 'An error occurred while deleting the account. Please try again later.'));
     next(error);
   }
 };

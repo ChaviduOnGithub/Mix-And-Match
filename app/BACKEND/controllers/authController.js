@@ -19,7 +19,21 @@ const signup = async (req, res, next) => {
       await newUser.save();
       res.status(201).json('User created successfully!');
     } catch (error) {
-      next(error);
+
+      if (error.code === 11000) {
+        if (error.keyPattern && error.keyPattern.email) {
+          return next(errorHandler(400, 'This email is already registered. Please log in or use another email.'));
+        }
+        if (error.keyPattern && error.keyPattern.username) {
+          return next(errorHandler(400, 'This username is already taken. Please choose a different username.'));
+        }
+      }
+  
+      // Fallback for other errors
+      next(errorHandler(500, 'An error occurred during sign up. Please try again.'));
+
+
+      //next(error);
     }
   };
 
@@ -37,7 +51,9 @@ const login = async (req, res, next) => {
         .status(200)
         .json(rest);
     } catch (error) {
-      next(error);
+
+      next(errorHandler(500, 'An error occurred during login. Please try again.'));
+      //next(error);
     }
 };
 
@@ -73,7 +89,9 @@ const google = async (req, res, next) => {
         .json(rest);
     }
   } catch (error) {
-    next(error);
+
+    next(errorHandler(500, 'An error occurred during Google authentication. Please try again.'));
+    //next(error);
   }
 };
 
@@ -84,7 +102,9 @@ const signOut = async (req, res, next) => {
     res.clearCookie('access_token', { httpOnly: true, path: '/' });
     res.status(200).json('User has been logged out!');
   } catch (error) {
-    next(error);
+
+    next(errorHandler(500, 'An error occurred during sign out. Please try again.'));
+    //next(error);
   }
 };
 
