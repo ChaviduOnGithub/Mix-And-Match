@@ -7,8 +7,8 @@ import {
   uploadBytesResumable,
 } from 'firebase/storage';
 import { app } from '../firebase';
-import { jsPDF } from 'jspdf'; // Import jsPDF
-import 'jspdf-autotable'; // Import autoTable plugin for tables
+import { jsPDF } from 'jspdf'; 
+import 'jspdf-autotable'; 
 
 import {
   updateUserStart,
@@ -87,12 +87,12 @@ export default function Profile(){
     try {
       dispatch(updateUserStart());
       const token = localStorage.getItem('access_token'); 
-      //const token = localStorage.getItem('token'); // or retrieve it from cookies
+      //const token = localStorage.getItem('token'); 
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-           'Authorization': `Bearer ${token}`, // Add token here
+           'Authorization': `Bearer ${token}`, 
         },
         body: JSON.stringify(formData),
       });
@@ -104,7 +104,7 @@ export default function Profile(){
         return;
       }
 
-      // Check for 200 status and handle errors more precisely
+      
     // if (!res.ok) {
     //   console.error(`Update failed: ${res.status} - ${res.statusText}`);
     //   dispatch(updateUserFailure(data.message || 'Failed to update user'));
@@ -113,7 +113,7 @@ export default function Profile(){
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
-      setErrorMessage(''); // Clear error message on success
+      setErrorMessage(''); 
     } catch (error) {
 
       setErrorMessage('Something went wrong while updating your profile. Please try again later.');
@@ -206,7 +206,7 @@ export default function Profile(){
       styles: {
         cellPadding: 3,
         fontSize: 10,
-        overflow: 'linebreak',  // Ensure long text wraps
+        overflow: 'linebreak',  
       },
 
     });
@@ -224,7 +224,7 @@ export default function Profile(){
       ]);
   
       doc.autoTable({
-        startY: doc.previousAutoTable.finalY + 10, // Start after previous table
+        startY: doc.previousAutoTable.finalY + 10, 
         head: [['Field', 'Previous Value', 'New Value', 'Updated At (SLT)']],
         body: historyBody,
         columnStyles: {
@@ -235,7 +235,7 @@ export default function Profile(){
         },
         styles: {
           fontSize: 10,
-          overflow: 'linebreak',  // Ensure text wrapping for long content
+          overflow: 'linebreak',  
         },
       
       });

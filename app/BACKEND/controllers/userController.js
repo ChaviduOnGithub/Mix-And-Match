@@ -1,75 +1,3 @@
-// const bcryptjs = require('bcryptjs');
-// const User = require('../models/userModel');
-// const { errorHandler } = require('../utils/error');
-
-// const test=(req,res)=>{
-//   res.json({
-//     message:'Hello',
-//   });
-// }
-
-// const updateUser = async (req, res, next) => {
-//   //console.log('Request User ID:', req.user.id); // Log the ID from the token
-//   //console.log('Request Params ID:', req.params.id); // Log the ID from the URL params
-
-
-//   if (req.user.id !== req.params.id)
-//     return next(errorHandler(401, 'You can only update your own account!'));
-//   try {
-//     if (req.body.password) {
-//       req.body.password = bcryptjs.hashSync(req.body.password, 10);
-//     }
-
-//     const updatedUser = await User.findByIdAndUpdate(
-//       req.params.id,
-//       {
-//         $set: {
-//           username: req.body.username,
-//           email: req.body.email,
-//           password: req.body.password,
-//           avatar: req.body.avatar,
-//         },
-//       },
-//       { new: true }
-//     );
-
-//     const { password, ...rest } = updatedUser._doc;
-
-//     res.status(200).json(rest);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// const deleteUser = async (req, res, next) => {
-//   if (req.user.id !== req.params.id)
-//     return next(errorHandler(401, 'You can only delete your own account!'));
-//   try {
-//     await User.findByIdAndDelete(req.params.id);
-//     res.clearCookie('access_token');
-//     res.status(200).json('User has been deleted!');
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// // const getUser = async (req, res, next) => {
-// //   try {
-    
-// //     const user = await User.findById(req.params.id);
-  
-// //     if (!user) return next(errorHandler(404, 'User not found!'));
-  
-// //     const { password: pass, ...rest } = user._doc;
-  
-// //     res.status(200).json(rest);
-// //   } catch (error) {
-// //     next(error);
-// //   }
-// // };
-
-// module.exports={test, updateUser, deleteUser};
-
 const bcryptjs = require('bcryptjs');
 const User = require('../models/userModel');
 const { errorHandler } = require('../utils/error');
@@ -182,5 +110,21 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find(); // Fetch all users
+    if (!users) return next(errorHandler(404, 'No users found!'));
 
-module.exports={test, updateUser, deleteUser};
+    // Remove passwords and avatars from the users before sending the response
+    const usersWithoutSensitiveData = users.map((user) => {
+      const { password, avatar, ...rest } = user._doc; // Exclude password and avatar
+      return rest;
+    });
+
+    res.status(200).json(usersWithoutSensitiveData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports={test, updateUser, deleteUser,getAllUsers};
