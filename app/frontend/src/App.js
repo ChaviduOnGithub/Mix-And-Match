@@ -9,6 +9,9 @@ import Home from './pages/Home';
 import Profile from './pages/Profile'; 
 import PrivateRoute from './components/accounts-management/PrivateRoute';
 
+import AdminLogin from './pages/AdminLogin';
+import AdminSignup from './pages/AdminSignup';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -24,6 +27,10 @@ function App() {
               <Route element={<PrivateRoute />} >
               <Route path="/profile" element={<Profile />} />
               </Route>
+
+              <Route path="/adminLogin" element={<AdminLogin />} />
+              <Route path="/adminSignup" element={<AdminSignup />} />
+              <Route path="/adminDashboard" element={<AdminDashboard />} />
             </Routes>
           </div>
         </BrowserRouter>

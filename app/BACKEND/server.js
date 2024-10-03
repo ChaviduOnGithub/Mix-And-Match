@@ -10,6 +10,9 @@ const session = require('express-session');
 
 const userRoutes  =require ('./routes/user')
 const authRouter=require('./routes/authRouter')
+
+const adminRoutes  =require ('./routes/adminRouter')
+
 const cookieParser = require('cookie-parser');
 
 const PORT = process.env.PORT || 8070;
@@ -50,6 +53,8 @@ app.listen(PORT, () => {
 //app.use(express.json());
 app.use('/api/user',userRoutes);
 app.use('/api/auth',authRouter);
+
+app.use('/api/admin',adminRoutes);
 
 // app.use((err, req, res, next) => {
 //     const statusCode = err.statusCode || 500;
