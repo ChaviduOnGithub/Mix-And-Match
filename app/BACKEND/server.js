@@ -8,6 +8,13 @@ const cors = require("cors");
 const app = express();
 const session = require('express-session');
 
+//Devinda 
+const CartRouter = require('./routes/cart_management/cart')
+
+//thimin
+const CartClothesRouter = require('./routes/CartClothesRoutes')
+
+
 const PORT = process.env.PORT || 8070;
 
 app.use(cors());
@@ -30,3 +37,8 @@ connection.once("open", () => {
 app.listen(PORT, () => {
     console.log(`Server is up and running on port ${PORT}`);
 });
+
+
+
+app.use("/cart",CartRouter);
+app.use("/home",CartClothesRouter);

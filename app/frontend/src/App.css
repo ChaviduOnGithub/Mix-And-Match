@@ -36,3 +36,53 @@
     transform: rotate(360deg);
   }
 }
+
+/* src/App.css */
+.cart-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.cart-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.cart-details {
+  flex-grow: 1;
+  margin-left: 20px;
+}
+
+.cart-details p {
+  margin: 5px 0;
+}
+
+.cart-totals {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.promo-code {
+  margin-top: 10px;
+}
+
+.promo-code input {
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.promo-code button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
