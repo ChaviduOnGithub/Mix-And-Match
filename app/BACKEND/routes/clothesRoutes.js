@@ -79,7 +79,7 @@ router.route("/").get((req,res)=>{
 
 router.put('/update/:item_code', upload.single('file'), async (req, res) => {
     const itm_code = req.params.item_code;
-    const { item_code, item_name, category, price, quantity, alert_quantity, supplier_id } = req.body;
+    const { item_code, item_name, category, price, quantity, alert_quantity } = req.body;
     const file = req.file; // New image file
 
     try {
@@ -114,7 +114,6 @@ router.put('/update/:item_code', upload.single('file'), async (req, res) => {
             price,
             quantity,
             alert_quantity,
-            supplier_id,
             imageUrl // Include the updated or retained imageUrl
         };
 

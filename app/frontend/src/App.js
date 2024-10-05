@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 
 import Clothes from './components/inventory-management/clothes';
+import Home from './components/home/homePage'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
 
 
           <Route path="/clothes" element={<Clothes/>}/>
+          <Route path="/homePage" element={<Home/>}/>
 
         </Routes>
     </BrowserRouter>

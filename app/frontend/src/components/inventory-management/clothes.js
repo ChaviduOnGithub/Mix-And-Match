@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import ClothesReturn from './return.js';
+import jsPDF from 'jspdf';
 
 
 export default function Clothes() {
@@ -17,12 +18,18 @@ export default function Clothes() {
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
     const [alertQuantity, setAlertQuantity] = useState('');
-    const [supplierId, setSupplierId] = useState('');
+    const [supplier_id, setSupplierId] = useState('');
     const [error, setError] = useState('');
     const [quantityChartData, setQuantityChartData] = useState(null);
     const [image, setImage] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+    const [previousStockLevels, setPreviousStockLevels] = useState({});
+    const [salesTracker, setSalesTracker] = useState({});
+    const [initialStock, setInitialStock] = useState({});
+    // const [calculatePurchasedQuantity, setcalculatePurchasedQuantity] = useState({})
+
+
     
     
 
@@ -30,6 +37,13 @@ export default function Clothes() {
         axios.get('http://localhost:8070/clothes/')
             .then((res) => {
                 setClothes(res.data);
+
+                // Track the initial stock levels
+                const initialStockData = {};
+                res.data.forEach(item => {
+                    initialStockData[item.item_code] = item.quantity; // Store initial quantity for each item
+                });
+                setInitialStock(initialStockData);
             })
             .catch((err) => {
                 alert(err.message);
@@ -93,7 +107,6 @@ export default function Clothes() {
         setPrice(clothes.price);
         setQuantity(clothes.quantity);
         setAlertQuantity(clothes.alert_quantity);
-        setSupplierId(clothes.supplierId);
         setShowUpdateModal(true);
     };
 
@@ -104,7 +117,7 @@ export default function Clothes() {
         try {
             setError('');
 
-            if (!itemCode || !itemName || !category || !price || !quantity || !alertQuantity || !supplierId || !selectedFile) {
+            if (!itemCode || !itemName || !category || !price || !quantity || !alertQuantity ) {
                 setError('All fields are required.');
                 return;
             }
@@ -116,15 +129,29 @@ export default function Clothes() {
             formData.append('price', price);
             formData.append('quantity', quantity);
             formData.append('alert_quantity', alertQuantity);
-            formData.append('supplier_id', supplierId);
+            formData.append('supplier_id', supplier_id);
             formData.append('file', selectedFile); // Append the image file
 
             if (selectedClothes) {
+                // Get previous stock level before updating
+                const previousQuantity = selectedClothes.quantity;
+                const newQuantity = parseInt(quantity);
+
+                // Store the reduction in stock
+                const reducedQuantity = previousQuantity - newQuantity;
+                console.log(`Item ${itemName} reduced by ${reducedQuantity} before restocking.`);
+                
                 await axios.put(`http://localhost:8070/clothes/update/${selectedClothes.item_code}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data' // Set the content type for file uploads
                     }
                 });
+
+                // Update the previous stock level in the state
+                setPreviousStockLevels((prev) => ({
+                    ...prev,
+                    [itemCode]: previousQuantity,
+                }));
 
                 resetForm();
                 setShowUpdateModal(false);
@@ -160,27 +187,131 @@ export default function Clothes() {
         clothes.item_code.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const generateReport = () => {
-        const totalQuantity = clothes.reduce((total, clothes) => total + clothes.quantity, 0);
     
-        const printWindow = window.open("", "_blank", "width=600,height=600");
-        printWindow.document.write(`
-            
+    
+
+    const generateReport = () => {
+        // Function to calculate purchased quantity for each item
+        const calculatePurchasedQuantity = (itemCode) => {
+            const initialQuantity = initialStock[itemCode] || 0; // Get the initial quantity (fallback to 0 if not found)
+            const currentItem = clothes.find(item => item.item_code === itemCode);
+            const currentQuantity = currentItem ? currentItem.quantity : 0;
+            return initialQuantity - currentQuantity; // Calculate the number of items purchased
+        };       
+
+        // Prepare the report data
+        const reportData = clothes.map(item => {
+            const purchasedQuantity = calculatePurchasedQuantity(item.item_code);
+
+            return {
+                itemName: item.item_name,
+                initialQuantity: initialStock[item.item_code],
+                currentQuantity: item.quantity,
+                purchasedQuantity,
+            };
+        });
+
+        // Calculate the most purchased items
+        const mostPurchasedItems = clothes.map(item => {
+            const purchasedQuantity = calculatePurchasedQuantity(item.item_code);
+            return {
+                itemName: item.item_name,
+                purchasedQuantity,
+            };
+        }).filter(item => item.purchasedQuantity > 0); // Filter to show only those with sales
+
+        // Generate the report in a new window
+        const reportWindow = window.open("", "_blank", "width=800,height=600");
+
+        // Write the report data into the new window
+        reportWindow.document.write(`
+            <html>
+                <head><title>Clothes Stock Report</title></head>
+                <body>
+                    <h1>Clothes Stock Report</h1>
+                    <table border="1" cellpadding="10" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Initial Quantity</th>
+                                <th>Current Quantity</th>
+                                <th>Purchased Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${reportData.map(item => `
+                                <tr>
+                                    <td>${item.itemName}</td>
+                                    <td>${item.initialQuantity}</td>
+                                    <td>${item.currentQuantity}</td>
+                                    <td>${item.purchasedQuantity}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <h2>Most Purchased Items</h2>
+                    <table border="1" cellpadding="10" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Purchased Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${mostPurchasedItems.map(item => `
+                                <tr>
+                                    <td>${item.itemName}</td>
+                                    <td>${item.purchasedQuantity}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <button onclick="window.print()">Print Report</button>
+                </body>
+            </html>
         `);
-        printWindow.document.close();
-        
-        printWindow.downloadCustomerReport = () => {
-            const pdfContent = printWindow.document.documentElement.outerHTML;
-            const pdfBlob = new Blob([pdfContent], { type: "application/pdf" });
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            const a = document.createElement("a");
-            a.href = pdfUrl;
-            a.download = "clothes_stock_report.pdf";
-            a.click();
-            URL.revokeObjectURL(pdfUrl);
-            printWindow.close();
-        };
+
+        reportWindow.document.close();
     };
+
+    const generateReportPDF = () => {
+        const doc = new jsPDF();
+
+        // Function to calculate purchased quantity for each item
+        const calculatePurchasedQuantity = (itemCode) => {
+            const initialQuantity = initialStock[itemCode] || 0; // Get the initial quantity (fallback to 0 if not found)
+            const currentItem = clothes.find(item => item.item_code === itemCode);
+            const currentQuantity = currentItem ? currentItem.quantity : 0;
+            return initialQuantity - currentQuantity; // Calculate the number of items purchased
+        };
+        
+        // Set title and headers
+        doc.setFontSize(18);
+        doc.text("Clothes Stock Report", 14, 22);
+        doc.setFontSize(12);
+        doc.text("Item Name", 14, 40);
+        doc.text("Initial Quantity", 64, 40);
+        doc.text("Current Quantity", 114, 40);
+        doc.text("Purchased Quantity", 164, 40);
+    
+        // Add the report data
+        let y = 50;
+        clothes.forEach(item => {
+            const purchasedQuantity = calculatePurchasedQuantity(item.item_code);
+            doc.text(item.item_name, 14, y);
+            doc.text(String(initialStock[item.item_code]), 64, y);
+            doc.text(String(item.quantity), 114, y);
+            doc.text(String(purchasedQuantity), 164, y);
+            y += 10;  // Move to next line
+        });
+    
+        // Save the PDF
+        doc.save('clothes_stock_report.pdf');
+    };
+    
+    
 
     const [selectedItemForDelete, setSelectedItemForDelete] = useState(null);
 
@@ -206,41 +337,41 @@ export default function Clothes() {
     
 
     return (
-        <ClothesReturn
-            clothes={clothes}
-            searchQuery={searchQuery}
-            handleSearch={handleSearch}
-            handleOpenAddModal={handleOpenAddModal}
-            showAddModal={showAddModal}
-            setShowAddModal={setShowAddModal}
-            handleFormSubmit={handleFormSubmit}
-            error={error}
-            itemCode={itemCode}
-            setItemCode={setItemCode}
-            itemName={itemName}
-            setItemName={setItemName}
-            category={category}
-            setCategory={setCategory}
-            price={price}
-            setPrice={setPrice}
-            quantity={quantity}
-            setQuantity={setQuantity}
-            alertQuantity={alertQuantity}
-            setAlertQuantity={setAlertQuantity}
-            supplierId={supplierId}
-            setSupplierId={setSupplierId}
-            handleImageUpload={handleImageUpload}
-            showUpdateModal={showUpdateModal}
-            setShowUpdateModal={setShowUpdateModal}
-            selectedItemForDelete={selectedItemForDelete}
-            handleCancelDelete={handleCancelDelete}
-            handleConfirmDelete={handleConfirmDelete}
-            filteredClothes={filteredClothes}
-            handleOpenUpdateModal={handleOpenUpdateModal}
-            handleOpenDeleteConfirmationModal={handleOpenDeleteConfirmationModal}
-            generateReport={generateReport}
-        /> 
-
+            <ClothesReturn
+                clothes={clothes}
+                searchQuery={searchQuery}
+                handleSearch={handleSearch}
+                handleOpenAddModal={handleOpenAddModal}
+                showAddModal={showAddModal}
+                setShowAddModal={setShowAddModal}
+                handleFormSubmit={handleFormSubmit}
+                error={error}
+                itemCode={itemCode}
+                setItemCode={setItemCode}
+                itemName={itemName}
+                setItemName={setItemName}
+                category={category}
+                setCategory={setCategory}
+                price={price}
+                setPrice={setPrice}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                alertQuantity={alertQuantity}
+                setAlertQuantity={setAlertQuantity}
+                supplierId={supplier_id}
+                setSupplierId={setSupplierId}
+                handleImageUpload={handleImageUpload}
+                showUpdateModal={showUpdateModal}
+                setShowUpdateModal={setShowUpdateModal}
+                selectedItemForDelete={selectedItemForDelete}
+                handleCancelDelete={handleCancelDelete}
+                handleConfirmDelete={handleConfirmDelete}
+                filteredClothes={filteredClothes}
+                handleOpenUpdateModal={handleOpenUpdateModal}
+                handleOpenDeleteConfirmationModal={handleOpenDeleteConfirmationModal}
+                generateReportPDF={generateReportPDF}
+                generateReport={generateReport}
+            /> 
             
     );
 }
