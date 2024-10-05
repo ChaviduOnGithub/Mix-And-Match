@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Cart from './components/cart-mamagement/Cart';
-import Home from './components/home/homePage';
+import Home from './components/home/ShophomePage';
 //import ClothesViewer from './components/home/itemPage';
 import ItemDetails from './components/home/itemDetails';
 import ClothesReturn from './components/home/returnHomePage';
