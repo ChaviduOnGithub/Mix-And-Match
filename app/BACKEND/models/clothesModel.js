@@ -28,22 +28,22 @@ const stockSchema = new Schema({
 
     price:{
         type: Number,
-        required: true
+        required: true  
     },
 
     alert_quantity:{
         type: Number,
-        required: true
+        required: true  
     },
 
     supplier_id: {
         type : String,
-        required: true
+        required: true  
     },
 
     imageUrl: {
         type: String,
-        required: true
+        required: true  
     }
     
 })

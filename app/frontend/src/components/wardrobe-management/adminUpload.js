@@ -3,6 +3,8 @@ import axios from 'axios';
 
 function AdminUpload() {
     const [selectedFile, setSelectedFile] = useState(null);
+    const [itemCode, setItemCode] = useState(''); // New state for itemCode
+    const [clothingName, setClothingName] = useState(''); // New state for clothingName
     const [clothingType, setClothingType] = useState('');
     const [colors, setColors] = useState('');
     const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
@@ -20,19 +22,21 @@ function AdminUpload() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        if (!selectedFile || !clothingType || !colors) {
+        if (!selectedFile || !itemCode || !clothingType || !clothingName || !colors) {
             alert('Please provide all fields!');
             return;
         }
 
         const formData = new FormData();
         formData.append('file', selectedFile); // File upload using 'file'
+        formData.append('itemCode', itemCode); // Include itemCode
         formData.append('clothingType', clothingType);
+        formData.append('clothingName', clothingName); // Include clothingName
         formData.append('colors', colors);
 
         try {
             // Send the file and metadata to the Node.js backend
-            const response = await axios.post('http://localhost:8070/admin/upload', formData, {
+            const response = await axios.post('http://localhost:8070/api/upload', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
@@ -56,6 +60,20 @@ function AdminUpload() {
                         file:text-sm file:font-semibold
                         file:bg-indigo-50 file:text-indigo-700
                         hover:file:bg-indigo-100"
+                />
+                <input
+                    type="text"
+                    value={itemCode} // New input for itemCode
+                    onChange={(e) => setItemCode(e.target.value)}
+                    placeholder="Item Code"
+                    className="mt-2 p-2 border border-gray-300 rounded"
+                />
+                <input
+                    type="text"
+                    value={clothingName} // New input for clothingName
+                    onChange={(e) => setClothingName(e.target.value)}
+                    placeholder="Clothing Name"
+                    className="mt-2 p-2 border border-gray-300 rounded"
                 />
                 <input
                     type="text"
