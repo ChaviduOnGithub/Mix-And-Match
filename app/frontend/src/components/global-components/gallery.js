@@ -7,7 +7,7 @@ const Gallery = () => {
       {/* Main Image */}
       <div>
         <img
-          className="h-auto max-w-full rounded-lg"
+          className="h-auto max-w-md rounded-lg"
           src="https://flowbite.s3.amazonaws.com/docs/gallery/featured/image.jpg"
           alt="Main Featured"
         />

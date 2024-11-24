@@ -153,13 +153,18 @@ def process_image():
         return jsonify({'error': 'No file provided'}), 400
 
     file = request.files['file']
-
+    
     # Read the image file
     img = Image.open(file)
     img = img.convert("RGBA")
 
+    print(f"Image format: {img.format}, size: {img.size}, mode: {img.mode}")  # Debug
+
     # Remove background using rembg
     output = remove(img)
+    
+    # Check output image format and mode
+    print(f"Output image size: {output.size}, mode: {output.mode}")  # Debug
 
     # Convert image to bytes
     buffered = io.BytesIO()
@@ -167,7 +172,6 @@ def process_image():
     processed_image = base64.b64encode(buffered.getvalue()).decode()
 
     return jsonify({'processedImage': processed_image})
-
 
 if __name__ == '__main__':
     app.run(debug=True)
