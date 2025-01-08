@@ -1,14 +1,7 @@
 import './App.css';
-<<<<<<< Updated upstream
-
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Correct import for BrowserRouter and Routes
-
-import React from 'react';
-=======
 import React from "react";
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { BrowserRouter } from 'react-router-dom'; // Ensure BrowserRouter is imported
->>>>>>> Stashed changes
 
 import Header from './components/global-components/header';
 import Footer from './components/global-components/footer';
@@ -40,19 +33,6 @@ function App() {
   // const isAdminRoute = location.pathname.startsWith('/admin'); 
 
   return (
-<<<<<<< Updated upstream
-    <Router>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} /> 
-        <Route path="/wardrobe" element={<Wardrobe/>} />
-        <Route path="/upload" element={<AdminUpload/>} />
-        <Route path="/video" element={<VideoStream />} />
-        <Route path="/clothes" element={<Clothes/>}/>
-      </Routes>
-      <Footer />
-    </Router>
-=======
     <div className="App">
       
       {/* {isAdminRoute ? <AdminNavBar /> : <NavBar />} */}
@@ -69,7 +49,6 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route element={<PrivateRoute />}>
             <Route path="/profile" element={<Profile />} />
-            <Route path="/cart" element={<Cart/>}/>
           </Route>
 
           
@@ -79,7 +58,7 @@ function App() {
           <Route path="/adminSignup" element={<AdminSignup />} />
           <Route path="/admin" element={<AdminDashboard />} /> {/* Allow for nested admin routes */}
 
-          
+          <Route path="/cart" element={<Cart/>}/>
           <Route path="/home" element={<Shop/>}/>
           {/* <Route path="/item" element={<ClothesViewer/>}/> */}
           <Route path="/item/:item_code" element={<ItemDetails/>}/>
@@ -89,7 +68,6 @@ function App() {
         </Routes>
       </div>
     </div>
->>>>>>> Stashed changes
   );
 }
 
